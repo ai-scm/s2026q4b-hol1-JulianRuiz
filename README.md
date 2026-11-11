@@ -14,7 +14,7 @@ Código: [`lambda/lambda_function.py`](lambda/lambda_function.py)
 
 ![Lambda](imagenes/02_lambda.png)
 
-Cada JSON se escribe en una sola línea para que Athena pueda leerlo. Ejemplo ([`ejemplo/10.json`](ejemplo/10.json)):
+Cada JSON se escribe en una sola línea para que Athena pueda leerlo. Ejemplo ([`csv-json/10.json`](csv-json/10.json)):
 
 ```json
 {"user_id": "10", "name": "Andrés Gómez", "country": "México", "city": "Santiago", "role": "Engineer", "department": "IT", "education": "PhD", "age": "39", "languages": "French", "salary": "98688", ...}
@@ -34,31 +34,49 @@ Se creó la base de datos `bld-tseed-workshop-julianruiz` y un crawler *on deman
 
 ## 3. Athena: consultas SQL
 
-El crawler dejó todas las columnas como `string`, por eso `age` se convierte con `CAST` para comparar números.
+### Cómo se ejecutaron
+
+1. En la consola de **Athena → Editor de consultas**, se configuró la ubicación de resultados en *Configuración de consultas* (Athena la exige antes de ejecutar).
+2. En el panel **Datos** se dejó el origen `AwsDataCatalog`. Como la base seleccionada por defecto era otra (`competenciasmayo2025`), cada consulta usa el nombre completo de la tabla: `"AwsDataCatalog"."bld-tseed-workshop-julianruiz"."julian_ruiz"`.
+3. Se escribió cada consulta en el editor y se ejecutó con **Ejecutar** (o `Ctrl + Enter`).
+4. En **Resultados de la consulta** se descargó el resultado como CSV, que es el archivo enlazado en la tabla de abajo.
+
+El crawler dejó todas las columnas como `string`, por eso `age` se convierte con `CAST` para comparar números, y `languages` se filtra con `LIKE` porque una persona puede tener varios idiomas en el mismo campo (por ejemplo, `"Spanish, English"`).
 
 ![Consulta en Athena](imagenes/04_athena_consulta.png)
 
-| # | Consulta | Filas | Resultado |
-|---|----------|-------|-----------|
-| 1 | Consulta general de la tabla | 68 | [`consulta1_general.csv`](resultados/consulta1_general.csv) |
-| 2 | Personas de Berlín con educación Bachelor | 0 | [`consulta2_berlin_bachelor.csv`](resultados/consulta2_berlin_bachelor.csv) |
-| 3 | Personas que hablan inglés y tienen más de 35 años | 19 | [`consulta3_ingles_mayores_35.csv`](resultados/consulta3_ingles_mayores_35.csv) |
+### Consulta 1: vista general de la tabla
+
+Sirve para comprobar que Athena lee bien los JSON y que las columnas salen correctas.
 
 ```sql
--- Consulta 2: Berlín + Bachelor
+SELECT *
+FROM "AwsDataCatalog"."bld-tseed-workshop-julianruiz"."julian_ruiz";
+```
+
+Resultado: 68 filas → [`consulta1_general.csv`](csv-json/consulta1_general.csv)
+
+### Consulta 2: personas de Berlín con educación Bachelor
+
+```sql
 SELECT *
 FROM "AwsDataCatalog"."bld-tseed-workshop-julianruiz"."julian_ruiz"
 WHERE city LIKE '%Berlin%'
   AND education LIKE '%Bachelor%';
+```
 
--- Consulta 3: inglés + mayores de 35
+Resultado: 0 filas → [`consulta2_berlin_bachelor.csv`](csv-json/consulta2_berlin_bachelor.csv). No hay usuarios en Berlín; las ciudades del dataset son Bogotá, Medellín, Lima, Santiago, Buenos Aires, Ciudad de México, Madrid y Barcelona.
+
+### Consulta 3: personas que hablan inglés y tienen más de 35 años
+
+```sql
 SELECT *
 FROM "AwsDataCatalog"."bld-tseed-workshop-julianruiz"."julian_ruiz"
 WHERE CAST(age AS integer) > 35
   AND languages LIKE '%English%';
 ```
 
-La consulta 2 no devuelve filas porque en el dataset no hay usuarios en Berlín (las ciudades son Bogotá, Medellín, Lima, Santiago, Buenos Aires, Ciudad de México, Madrid y Barcelona).
+Resultado: 19 filas → [`consulta3_ingles_mayores_35.csv`](csv-json/consulta3_ingles_mayores_35.csv)
 
 ## Problemas resueltos en el camino
 
@@ -71,8 +89,12 @@ La consulta 2 no devuelve filas porque en el dataset no hay usuarios en Berlín 
 
 ```
 ├── README.md
-├── lambda/lambda_function.py
-├── ejemplo/10.json
-├── resultados/        # CSV exportados desde Athena
+├── lambda/
+│   └── lambda_function.py
+├── csv-json/          # JSON de ejemplo y CSV exportados desde Athena
+│   ├── 10.json
+│   ├── consulta1_general.csv
+│   ├── consulta2_berlin_bachelor.csv
+│   └── consulta3_ingles_mayores_35.csv
 └── imagenes/          # Pantallazos de S3, Lambda, Glue y Athena
 ```

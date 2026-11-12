@@ -54,7 +54,7 @@ SELECT *
 FROM "AwsDataCatalog"."bld-tseed-workshop-julianruiz"."julian_ruiz";
 ```
 
-Resultado: 68 filas → [`consulta1_general.csv`](csv-json/consulta1_general.csv)
+Resultado: 68 filas → [`consulta1_general.csv`](csv-json/Consulta1.csv)
 
 ### Consulta 2: personas de Berlín con educación Bachelor
 
@@ -65,7 +65,7 @@ WHERE city LIKE '%Berlin%'
   AND education LIKE '%Bachelor%';
 ```
 
-Resultado: 0 filas → [`consulta2_berlin_bachelor.csv`](csv-json/consulta2_berlin_bachelor.csv). No hay usuarios en Berlín; las ciudades del dataset son Bogotá, Medellín, Lima, Santiago, Buenos Aires, Ciudad de México, Madrid y Barcelona.
+Resultado: 0 filas → [`consulta2_berlin_bachelor.csv`](csv-json/Consulta2.csv). No hay usuarios en Berlín; las ciudades del dataset son Bogotá, Medellín, Lima, Santiago, Buenos Aires, Ciudad de México, Madrid y Barcelona.
 
 ### Consulta 3: personas que hablan inglés y tienen más de 35 años
 
@@ -76,7 +76,7 @@ WHERE CAST(age AS integer) > 35
   AND languages LIKE '%English%';
 ```
 
-Resultado: 19 filas → [`consulta3_ingles_mayores_35.csv`](csv-json/consulta3_ingles_mayores_35.csv)
+Resultado: 19 filas → [`consulta3_ingles_mayores_35.csv`](csv-json/Consulta3.csv)
 
 ## Problemas resueltos en el camino
 
